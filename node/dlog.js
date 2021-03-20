@@ -59,7 +59,7 @@ function getStack() {
   // console.log(stackElement.isNative()) // false
   // console.log(stackElement.isPromiseAll()) // false
   // console.log(stackElement.isToplevel()) // true
-  // console.log(stackElement.toString()) // before-enter (eval at createFunction (http://localhost:8080/js/vue/vue.js:11649:14), <anonymous>:4:17)
+  // console.log(stackElement.toString()) // before-enter (eval at createFunction (http://localhost:8080/js/vue/vue.js:11649:14), ${r'<anonymous>'}:4:17)
   return stackElement
 }
 
@@ -71,14 +71,33 @@ function getStack() {
 
 function now_time() {
   var date         = new Date()
-  var hours        = `${date.getHours()}`.padStart(2, '0')
-  var minutes      = `${date.getMinutes()}`.padStart(2, '0')
-  var seconds      = `${date.getSeconds()}`.padStart(2, '0')
-  var milliseconds = `${date.getMilliseconds()}`.padStart(3, '0')
-  return `${hours}:${minutes}:${seconds}:${milliseconds}`
+  var hours        = (date.getHours() + '').padStart(2, '0')
+  var minutes      = (date.getMinutes() + '').padStart(2, '0')
+  var seconds      = (date.getSeconds() + '').padStart(2, '0')
+  var milliseconds = (date.getMilliseconds() + '').padStart(3, '0')
+  return hours + ':' + minutes + ':' + seconds + ':' + milliseconds
 }
 
 function finalPrint(obj, variableName, typeStringValue, stack) {
+  // console.log(stack.__proto__);
+
+  // try {console.log('--->constructor | \t\t\t',stack.constructor());} catch(err){console.error(err)}
+  // try {console.log('--->getColumnNumber | \t\t\t',stack.getColumnNumber());} catch(err){console.error(err)}
+  // try {console.log('--->getEvalOrigin | \t\t\t',stack.getEvalOrigin());} catch(err){console.error(err)}
+  // try {console.log('--->getFileName | \t\t\t',stack.getFileName());} catch(err){console.error(err)}
+  // ***** try {console.log('--->getFunction | \t\t\t',stack.getFunction());} catch(err){console.error(err)}
+  // try {console.log('--->getFunctionName | \t\t\t',stack.getFunctionName());} catch(err){console.error(err)}
+  // try {console.log('--->getLineNumber | \t\t\t',stack.getLineNumber());} catch(err){console.error(err)}
+  // try {console.log('--->getMethodName | \t\t\t',stack.getMethodName());} catch(err){console.error(err)}
+  // try {console.log('--->getPosition | \t\t\t',stack.getPosition());} catch(err){console.error(err)}
+  // try {console.log('--->getScriptNameOrSourceURL | \t\t\t',stack.getScriptNameOrSourceURL());} catch(err){console.error(err)}
+  // try {console.log('--->getThis | \t\t\t',stack.getThis());} catch(err){console.error(err)}
+  // try {console.log('--->getTypeName | \t\t\t',stack.getTypeName());} catch(err){console.error(err)}
+  // try {console.log('--->isConstructor | \t\t\t',stack.isConstructor());} catch(err){console.error(err)}
+  // try {console.log('--->isEval | \t\t\t',stack.isEval());} catch(err){console.error(err)}
+  // try {console.log('--->isNative | \t\t\t',stack.isNative());} catch(err){console.error(err)}
+  // try {console.log('--->isToplevel | \t\t\t',stack.isToplevel());} catch(err){console.error(err)}
+  // try {console.log('--->toString | \t\t\t',stack.toString());} catch(err){console.error(err)}
 
   let columnNumber = stack.getColumnNumber()
   // let evalOrigin            = stack.getEvalOrigin()
@@ -116,27 +135,23 @@ function finalPrint(obj, variableName, typeStringValue, stack) {
   if (!functionName) {
     functionName = '<anonymous>'
   }
+  else {
+    functionName = functionName + '()'
+  }
 
-  console.group(
-    // `%s %s <%s> :- ${green(' %s ')}${blue(' %s ')}${black(' = ↓')}`,
-    `%c%s %c %s() %c <%s> :- %c %s %c %s %c = ↓`,
-    'font-weight:normal;font-family: "JetBrains Mono"',
+  console.group(`%s %s <%s> :- %s%s = ↓`,
     fileInfo,
-    'background-color:#FFDFA2;color:#AA7942;font-weight:100;font-family: "JetBrains Mono";line-height:18px',
-    functionName,
-    'font-weight:100',
+    orangeBackground(functionName),
     now_time(),
-    'background-color:#025100;color:#FFF;font-weight:100;line-height:18px;font-size:12px;font-family:"JetBrains Mono"',
-    variableName,
-    'background-color:#078DFF;color:#FFF;font-weight:100;line-height:18px;font-size:12px;font-family:"JetBrains Mono"',
-    typeStringValue,
-    'color:black;font-weight:normal;',
+    greenBackground(variableName),
+    blueBackground(typeStringValue),
   )
   // console.log(obj)
   // %o、%O都是用来输出Object对象的，对普通的Object对象，两者没区别，但是打印dom节点时不一样
   // %o输出和不使用格式化输出打印出来的结果一样，可以查看这个dom节点的内容、子节点等；
   // 而%O，你看到的则是该dom节点各个对象属性。
-  console.log('%c%o', 'color:blue;font-family: "JetBrains Mono"', obj)
+  console.log('%o', obj)
+
   if (typeStringValue === '[object Arguments]') {
     // console.dir(variableName);
     for (let key in variableName) {
@@ -146,6 +161,32 @@ function finalPrint(obj, variableName, typeStringValue, stack) {
   }
   console.groupEnd()
 }
+
+function greenForeground(obj) {
+  return '\x1b[0;32;2m' + obj + '\x1b[0m'
+}
+
+function greenBackground(obj) {
+  return '\x1b[0;97;42m ' + obj + ' \x1b[0m'
+}
+
+function blueBackground(obj) {
+  return '\x1b[0;97;44m ' + obj + ' \x1b[0m'
+}
+
+function orangeBackground(obj) {
+  return '\x1b[0;7;94m ' + obj + ' \x1b[0m'
+}
+
+function red(obj) {}
+
+function black(obj) {}
+
+function white(obj) {}
+
+function white(obj) {}
+
+function blue(obj) {}
 
 function getAllInformation(obj) {
   let res = getMethods(obj)
@@ -199,3 +240,5 @@ function getMethods(obj) {
 
   return res
 }
+
+module.exports = dlog
